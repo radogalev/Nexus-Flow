@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Search | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card page-hero mb-4">
+  <h1 class="h3 mb-3">Search</h1>
+  <form method="get" class="row g-2">
+    <div class="col-md-10"><input class="form-control" name="q" value="{{ q }}" placeholder="Search projects, tasks, clients, contracts"></div>
+    <div class="col-md-2 d-grid"><button class="btn btn-primary">Search</button></div>
+  </form>
+</section>
+{% if not q %}
+<div class="empty-state">Enter a search term above to find projects, tasks, clients, and contracts.</div>
+{% else %}
+<p class="text-muted mb-3">Found {{ total_results }} results for "{{ q }}".</p>
+<section class="row g-3">
+  <div class="col-lg-6">
+    <div class="glass-card p-3 h-100">
+      <h4>Projects ({{ counts.projects }})</h4>
+      {% if results.projects %}
+      <ul class="list-group list-group-flush">
+        {% for item in results.projects %}
+        <li class="list-group-item bg-transparent px-0">
+          <a href="{% url 'projects:detail' item.slug %}">{{ item.title }}</a>
+          <div class="small text-muted">{{ item.get_status_display }} | {{ item.company.name }} | Deadline {{ item.deadline|date:'M j, Y' }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="small text-muted">No results</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="glass-card p-3 h-100">
+      <h4>Tasks ({{ counts.tasks }})</h4>
+      {% if results.tasks %}
+      <ul class="list-group list-group-flush">
+        {% for item in results.tasks %}
+        <li class="list-group-item bg-transparent px-0">
+          <a href="{% url 'projects:task_detail' item.pk %}">{{ item.title }}</a>
+          <div class="small text-muted">{{ item.get_status_display }} | {{ item.get_priority_display }} | <a href="{% url 'projects:detail' item.project.slug %}">{{ item.project.title }}</a> | {{ item.assigned_to.full_name|default:'Unassigned' }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="small text-muted">No results</div>{% endif %}
+    </div>
+  </div>
+
+  {% if is_manager %}
+  <div class="col-lg-6">
+    <div class="glass-card p-3 h-100">
+      <h4>Clients ({{ counts.clients }})</h4>
+      {% if results.clients %}
+      <ul class="list-group list-group-flush">
+        {% for item in results.clients %}
+        <li class="list-group-item bg-transparent px-0">
+          <a href="{% url 'contracts:client_edit' item.pk %}">{{ item.name }}</a>
+          <div class="small text-muted">{{ item.company.name }} | {{ item.email }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="small text-muted">No results</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="col-lg-6">
+    <div class="glass-card p-3 h-100">
+      <h4>Contracts ({{ counts.contracts }})</h4>
+      {% if results.contracts %}
+      <ul class="list-group list-group-flush">
+        {% for item in results.contracts %}
+        <li class="list-group-item bg-transparent px-0">
+          <a href="{% url 'contracts:detail' item.pk %}">{{ item.title }}</a>
+          <div class="small text-muted">{{ item.client.name }} | {{ item.get_status_display }} | Expires {{ item.end_date|date:'M j, Y' }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="small text-muted">No results</div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

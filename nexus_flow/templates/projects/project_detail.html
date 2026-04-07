@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}{{ object.title }} | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+    <div>
+      <h1 class="h3 mb-1">{{ object.title }}</h1>
+      <p class="text-muted mb-1">{{ object.description|default:'No project description.' }}</p>
+      <div class="small">Status: {{ object.get_status_display }} | Deadline: {{ object.deadline }}</div>
+    </div>
+    {% if can_add_task or can_manage_project %}
+    <div class="d-flex gap-2">
+      {% if can_add_task %}
+      <a class="btn btn-primary btn-sm" href="{% url 'projects:task_create' object.slug %}">Add task</a>
+      {% endif %}
+      {% if can_manage_project %}
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'projects:edit' object.slug %}">Edit</a>
+      {% endif %}
+      {% if can_delete_project %}
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'projects:delete' object.slug %}">Delete</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="row g-3 mb-3">
+  <div class="col-lg-8">
+    <div class="glass-card p-3">
+      <div class="task-board">
+        <div class="task-column"><h2 class="h6">To do</h2>{% for t in todo_tasks %}<div class="task-card"><a href="{% url 'projects:task_detail' t.pk %}">{{ t.title }}</a></div>{% empty %}<div class="small text-muted">No tasks</div>{% endfor %}</div>
+        <div class="task-column"><h2 class="h6">In progress</h2>{% for t in in_progress_tasks %}<div class="task-card"><a href="{% url 'projects:task_detail' t.pk %}">{{ t.title }}</a></div>{% empty %}<div class="small text-muted">No tasks</div>{% endfor %}</div>
+        <div class="task-column"><h2 class="h6">In review</h2>{% for t in in_review_tasks %}<div class="task-card"><a href="{% url 'projects:task_detail' t.pk %}">{{ t.title }}</a></div>{% empty %}<div class="small text-muted">No tasks</div>{% endfor %}</div>
+        <div class="task-column"><h2 class="h6">Done</h2>{% for t in done_tasks %}<div class="task-card"><a href="{% url 'projects:task_detail' t.pk %}">{{ t.title }}</a></div>{% empty %}<div class="small text-muted">No tasks</div>{% endfor %}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="glass-card p-3 mb-3">
+      <h2 class="h6">Members</h2>
+      <ul class="list-group list-group-flush">
+        {% for m in members %}
+        <li class="list-group-item bg-transparent px-0">{{ m.full_name|default:m.email }}</li>
+        {% empty %}<li class="list-group-item bg-transparent px-0">No members.</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="glass-card p-3">
+      <h2 class="h6">Recent activity</h2>
+      {% if recent_activity %}
+      <ul class="list-group list-group-flush">
+        {% for a in recent_activity %}<li class="list-group-item bg-transparent px-0 small">{{ a.actor }} {{ a.verb }}</li>{% endfor %}
+      </ul>
+      {% else %}<div class="empty-state">No activity.</div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

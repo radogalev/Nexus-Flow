@@ -1,0 +1,3 @@
+web: gunicorn nexus_flow.wsgi --log-file -
+worker: celery -A nexus_flow worker --loglevel=info
+beat: celery -A nexus_flow beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler

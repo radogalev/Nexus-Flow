@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Task | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h1 class="h4 mb-1">{{ object.title }}</h1>
+      <p class="text-muted mb-1">{{ object.description|default:'No task description.' }}</p>
+      <div class="small">Priority: {{ object.get_priority_display }} | Status: {{ object.get_status_display }}</div>
+    </div>
+    {% if can_edit_task or can_delete_task %}
+    <div class="d-flex gap-2">
+      {% if can_edit_task %}
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'projects:task_edit' object.pk %}">Edit</a>
+      {% endif %}
+      {% if can_delete_task %}
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'projects:task_delete' object.pk %}">Delete</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="row g-3">
+  <div class="col-lg-8">
+    {% if can_update_status %}
+    <div class="glass-card p-3 mb-3">
+      <h2 class="h6">Change status</h2>
+      <form method="post" action="{% url 'projects:task_status_update' %}" class="d-flex gap-2 align-items-end">
+        {% csrf_token %}
+        <input type="hidden" name="task_id" value="{{ object.id }}">
+        <div>
+          <label class="form-label" for="new_status">Status</label>
+          <select class="form-select" name="new_status" id="new_status">
+            <option value="todo">To do</option>
+            <option value="in_progress">In progress</option>
+            <option value="in_review">In review</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Update</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="glass-card p-3">
+      <h2 class="h6">Comments</h2>
+      {% if comments %}
+        <ul class="list-group list-group-flush mb-3">
+          {% for c in comments %}<li class="list-group-item bg-transparent px-0"><strong>{{ c.author.full_name|default:c.author.email }}</strong> <span class="text-muted small">{{ c.created_at|date:'M d, H:i' }}</span><div>{{ c.body }}</div></li>{% endfor %}
+        </ul>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        {{ comment_form.body }}
+        <button class="btn btn-primary btn-sm mt-2" type="submit">Add comment</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="glass-card p-3">
+      <h2 class="h6">Task details</h2>
+      <p class="mb-1"><strong>Assigned:</strong> {{ object.assigned_to|default:'Unassigned' }}</p>
+      <p class="mb-1"><strong>Due date:</strong> {{ object.due_date|default:'-' }}</p>
+      <p class="mb-0"><strong>Project:</strong> <a href="{% url 'projects:detail' object.project.slug %}">{{ object.project.title }}</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Team Directory | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card page-hero mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h1 class="h3 mb-1">Company users</h1>
+      <p class="text-muted mb-0">Browse and search team members by role and department.</p>
+    </div>
+    <form method="get" class="d-flex gap-2">
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search name or email">
+      <button class="btn btn-primary">Search</button>
+    </form>
+  </div>
+</section>
+
+<div class="glass-card p-3">
+  {% if object_list %}
+  <div class="table-responsive table-modern">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>User</th><th>Email</th><th>Job title</th><th>Department</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for u in object_list %}
+        <tr>
+          <td><a href="{% url 'accounts:profile' u.pk %}">{{ u.full_name|default:u.email }}</a></td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.job_title|default:'-' }}</td>
+          <td>{{ u.department|default:'-' }}</td>
+          <td>{{ u.date_joined|date:'Y-m-d' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="empty-state">No users found.</div>{% endif %}
+</div>
+{% endblock %}

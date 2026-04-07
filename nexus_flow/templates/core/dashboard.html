@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load nexusflow_tags %}
+{% block title %}Dashboard | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card page-hero mb-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h1 class="h2 mb-1">{{ day_greeting }}, {{ request.user.first_name|default:request.user.email }}.</h1>
+      <p class="text-muted mb-0">Your operational snapshot across tasks, projects, and contracts.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'projects:list' %}">New task</a>
+      <a class="btn btn-sm btn-primary" href="{% url 'projects:create' %}">New project</a>
+      {% if is_manager %}
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'contracts:create' %}">New contract</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="row g-3 mb-3">
+  <div class="col-6 col-lg-3"><div class="glass-card p-3"><div class="small text-muted">To do</div><div class="h3 mb-0">{{ task_stats.todo }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="glass-card p-3"><div class="small text-muted">In progress</div><div class="h3 mb-0">{{ task_stats.in_progress }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="glass-card p-3"><div class="small text-muted">In review</div><div class="h3 mb-0">{{ task_stats.in_review }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="glass-card p-3"><div class="small text-muted">Done this week</div><div class="h3 mb-0">{{ task_stats.done_this_week }}</div></div></div>
+</section>
+
+<section class="row g-3">
+  <div class="col-lg-7">
+    <div class="glass-card p-3">
+      <h4>Upcoming deadlines</h4>
+      {% if upcoming_deadlines %}
+      <ul class="list-group list-group-flush">
+        {% for item in upcoming_deadlines %}
+        <li class="list-group-item bg-transparent px-0 d-flex justify-content-between">
+          <div>
+            <span class="badge text-bg-light me-1">{{ item.type }}</span>
+            <a href="{{ item.url }}">{{ item.title }}</a>
+          </div>
+          {% if item.is_overdue %}
+          <span class="badge text-bg-danger">Overdue</span>
+          {% else %}
+          <span class="small text-muted">{{ item.remaining_days }} days</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="empty-state">No upcoming deadlines. You are all caught up.</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="glass-card p-3 mb-3">
+      <h4>Recent activity</h4>
+      {% if recent_activity %}
+      <ul class="list-group list-group-flush">
+        {% for activity in recent_activity|slice:':10' %}
+          <li class="list-group-item bg-transparent px-0 small">{{ activity.actor.full_name|default:activity.actor.email }} {{ activity.verb }} <span class="text-muted">{{ activity.timestamp|timesince }} ago</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="empty-state">No activity yet. Create a project to get started.</div>{% endif %}
+    </div>
+
+    {% if is_manager and expiring_contracts %}
+    <div class="glass-card p-3 mt-3">
+      <h4>Contracts expiring soon</h4>
+      <ul class="list-group list-group-flush">
+        {% for contract in expiring_contracts %}
+        <li class="list-group-item bg-transparent px-0 d-flex justify-content-between">
+          <a href="{% url 'contracts:detail' contract.pk %}">{{ contract.title }}</a>
+          {% if contract.days_until_expiry <= 7 %}
+          <span class="badge text-bg-danger">{{ contract.days_until_expiry }} days</span>
+          {% else %}
+          <span class="badge text-bg-warning">{{ contract.days_until_expiry }} days</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if is_manager and company_overview %}
+    <div class="row g-2 mt-1">
+      <div class="col-6"><div class="glass-card p-3"><div class="small text-muted">Total employees</div><div class="h4 mb-0">{{ company_overview.total_employees }}</div></div></div>
+      <div class="col-6"><div class="glass-card p-3"><div class="small text-muted">Active projects</div><div class="h4 mb-0">{{ company_overview.active_projects }}</div></div></div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Delete Department | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4">
+  <h1 class="h4 text-danger mb-3">Delete department</h1>
+  <p>Type <strong>DELETE</strong> to confirm removal of {{ object.name }}.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label" for="id_confirm">Type "DELETE" to confirm</label>
+      <input class="form-control" id="id_confirm" name="confirm" required>
+      {% if form.confirm.errors %}{% for error in form.confirm.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}{% endif %}
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'companies:department_detail' object.pk %}">Cancel</a>
+    <button class="btn btn-danger" type="submit">Delete department</button>
+  </form>
+</section>
+{% endblock %}

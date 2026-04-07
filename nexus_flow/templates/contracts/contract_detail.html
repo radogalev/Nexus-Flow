@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ object.title }} | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h1 class="h3 mb-1">{{ object.title }}</h1>
+      <p class="mb-1"><strong>Client:</strong> {{ object.client }}</p>
+      <p class="mb-1"><strong>Status:</strong> {{ object.get_status_display }}</p>
+      <p class="mb-0"><strong>Period:</strong> {{ object.start_date }} - {{ object.end_date }}</p>
+    </div>
+    {% if is_manager %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'contracts:edit' object.pk %}">Edit</a>
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'contracts:delete' object.pk %}">Delete</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="row g-3">
+  <div class="col-lg-7">
+    <div class="glass-card p-3 mb-3">
+      <h2 class="h5">Services breakdown</h2>
+      {% if contract_services %}
+      <div class="table-responsive table-modern">
+        <table class="table table-sm align-middle mb-0">
+          <thead><tr><th>Service</th><th>Qty</th><th>Unit</th><th>Line total</th></tr></thead>
+          <tbody>
+            {% for cs in contract_services %}
+            <tr><td>{{ cs.service.name }}</td><td>{{ cs.quantity }}</td><td>{% if is_manager %}${{ cs.service.unit_price }}{% else %}-{% endif %}</td><td>{% if is_manager %}${{ cs.line_total }}{% else %}-{% endif %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="text-end fw-semibold mt-2">Grand total: {% if is_manager %}${{ grand_total }}{% else %}-{% endif %}</div>
+      {% else %}<div class="empty-state">No services linked.</div>{% endif %}
+    </div>
+
+    <div class="glass-card p-3">
+      <h2 class="h5">Linked projects</h2>
+      {% if linked_projects %}
+      <ul class="list-group list-group-flush">
+        {% for p in linked_projects %}<li class="list-group-item bg-transparent px-0"><a href="{% url 'projects:detail' p.slug %}">{{ p.title }}</a></li>{% endfor %}
+      </ul>
+      {% else %}<div class="empty-state">No linked projects.</div>{% endif %}
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="glass-card p-3">
+      <h2 class="h5">Summary</h2>
+      <p><strong>Value:</strong> {% if is_manager %}${{ object.value }}{% else %}-{% endif %}</p>
+      <p><strong>Days until expiry:</strong> {{ object.days_until_expiry }}</p>
+      {% if object.document %}
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'contracts:protected_media' object.document.name|cut:'contract_docs/' %}">Download document</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

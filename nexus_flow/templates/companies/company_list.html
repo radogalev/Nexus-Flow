@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Companies | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card page-hero mb-3 d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1 class="h3 mb-1">Companies</h1>
+    <p class="text-muted mb-0">Browse organization profiles and department structures.</p>
+  </div>
+  {% if can_create_company %}
+  <a class="btn btn-primary" href="{% url 'companies:create' %}">Create company</a>
+  {% endif %}
+</section>
+
+<div class="row g-3">
+  {% for company in object_list %}
+    <div class="col-md-6 col-xl-4">
+      <div class="glass-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start">
+          <h2 class="h5 mb-2">{{ company.name }}</h2>
+          <span class="badge text-bg-light">{{ company.get_sector_display }}</span>
+        </div>
+        <p class="text-muted small">{{ company.description|default:'No description yet.'|truncatechars:120 }}</p>
+        <div class="small mb-3">Employees: {{ company.employee_count|default:company.employees.count }}</div>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'companies:detail' company.slug %}">View company</a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12"><div class="empty-state">No companies available.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

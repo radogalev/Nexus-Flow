@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Clients | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card page-hero mb-3 d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h1 class="h3 mb-1">Clients</h1>
+    <p class="text-muted mb-0">Manage customers linked to your company contracts.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'contracts:client_create' %}">Create client</a>
+</section>
+
+<div class="glass-card p-3">
+  {% if object_list %}
+  <div class="table-responsive table-modern">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Name</th><th>Email</th><th>Contact</th><th>Phone</th><th></th></tr></thead>
+      <tbody>
+        {% for client in object_list %}
+        <tr>
+          <td>{{ client.name }}</td>
+          <td>{{ client.email }}</td>
+          <td>{{ client.contact_person|default:'-' }}</td>
+          <td>{{ client.phone|default:'-' }}</td>
+          <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'contracts:client_edit' client.pk %}">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="empty-state">No clients yet.</div>{% endif %}
+</div>
+{% endblock %}

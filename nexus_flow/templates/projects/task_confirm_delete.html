@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Delete Task | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4">
+  <h1 class="h4 text-danger">Delete task</h1>
+  <p>Confirm deletion of <strong>{{ object.title }}</strong>.</p>
+  <form method="post">
+    {% csrf_token %}
+    <a class="btn btn-outline-secondary" href="{% url 'projects:task_detail' object.pk %}">Cancel</a>
+    <button class="btn btn-danger" type="submit">Delete task</button>
+  </form>
+</section>
+{% endblock %}

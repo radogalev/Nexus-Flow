@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Department | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h1 class="h4 mb-1">{{ object.name }}</h1>
+      <p class="text-muted mb-0">{{ object.description|default:'No department description.' }}</p>
+    </div>
+    {% if can_manage_department %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'companies:department_edit' object.pk %}">Edit</a>
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'companies:department_delete' object.pk %}">Delete</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="glass-card p-3">
+  <h2 class="h5">Members</h2>
+  {% if members %}
+    <ul class="list-group list-group-flush">
+      {% for m in members %}
+        <li class="list-group-item bg-transparent px-0">{{ m.full_name|default:m.email }} <span class="small text-muted">{{ m.job_title|default:'-' }}</span></li>
+      {% endfor %}
+    </ul>
+  {% else %}<div class="empty-state">No members in this department.</div>{% endif %}
+</div>
+{% endblock %}

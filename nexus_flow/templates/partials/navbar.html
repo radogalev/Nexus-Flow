@@ -1,0 +1,66 @@
+{% load nexusflow_tags %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
+  <div class="container py-1">
+    <a class="navbar-brand brand-mark" href="{% if request.user.is_authenticated %}{% url 'core:dashboard' %}{% else %}{% url 'core:landing' %}{% endif %}">
+      <span class="brand-dot"></span>NexusFlow
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      {% if request.user.is_authenticated %}
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'projects:list' %}">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'companies:list' %}">Companies</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'contracts:list' %}">Contracts</a></li>
+      </ul>
+      <form class="d-flex me-3" method="get" action="{% url 'core:search' %}">
+        <input class="form-control form-control-sm" name="q" placeholder="Search projects, tasks, contracts">
+      </form>
+
+      <ul class="navbar-nav align-items-center mb-2 mb-lg-0">
+        <li class="nav-item me-2">
+          <a class="nav-link position-relative" href="{% url 'core:notifications' %}">
+            Notifications
+            {% unread_notifications as unread_count %}
+            {% if unread_count %}<span class="badge text-bg-danger ms-1">{{ unread_count }}</span>{% endif %}
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% if request.user.avatar %}
+              <img src="{{ request.user.avatar.url }}" alt="Avatar" class="rounded-circle" width="28" height="28" style="object-fit: cover;">
+            {% else %}
+              <span class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.7rem;">
+                {{ request.user.first_name|slice:':1' }}{{ request.user.last_name|slice:':1' }}
+              </span>
+            {% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">{{ request.user.full_name|default:request.user.email }}<br>{{ request.user.email }}</h6></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:profile' request.user.pk %}">My profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}">Change password</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'accounts:logout' %}" class="px-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link dropdown-item p-0 text-start">Log out</button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      {% else %}
+      <ul class="navbar-nav ms-auto align-items-center mb-2 mb-lg-0">
+        <li class="nav-item me-2">
+        <a class="btn btn-outline-light btn-sm me-2" href="{% url 'accounts:login' %}">Log in</a>
+        </li>
+        <li class="nav-item">
+        <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Sign up</a>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Contract Form | NexusFlow{% endblock %}
+{% block content %}
+<section class="glass-card p-4">
+  <h1 class="h4 mb-3">{% if object %}Edit contract{% else %}Create contract{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+
+    <h2 class="h6 mt-4">Services</h2>
+    {{ formset.management_form }}
+    <div id="service-formset">
+      {% for sf in formset %}
+      <div class="contract-service-row border rounded p-2 mb-2 bg-light-subtle">
+        {{ sf.id }}
+        <div class="row g-2">
+          <div class="col-md-6">{{ sf.service.label_tag }}{{ sf.service }}</div>
+          <div class="col-md-3">{{ sf.quantity.label_tag }}{{ sf.quantity }}</div>
+          <div class="col-md-3 d-flex align-items-end">{% if sf.DELETE %}<div class="form-check">{{ sf.DELETE }} <label class="form-check-label" for="{{ sf.DELETE.id_for_label }}">Delete</label></div>{% endif %}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="btn btn-outline-primary btn-sm mb-3" id="add-service-row" type="button">Add service row</button>
+
+    <div><button class="btn btn-primary" type="submit">Save contract</button></div>
+  </form>
+</section>
+{% endblock %}

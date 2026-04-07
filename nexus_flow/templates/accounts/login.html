@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Login | NexusFlow{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <section class="glass-card p-4">
+      {% if not request.user.is_authenticated %}
+      <p class="text-muted mb-3">NexusFlow helps your team manage projects, contracts, and clients. Sign in to access your workspace.</p>
+      {% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        {% for error in form.non_field_errors %}<div class="text-danger small mb-2">{{ error }}</div>{% endfor %}
+        <button class="btn btn-primary" type="submit">Log in</button>
+      </form>
+      <p class="small mt-3 mb-1">Don't have an account? <a href="{% url 'accounts:register' %}">Register</a></p>
+      <p class="small mb-0">Forgot your password? <a href="{% url 'accounts:password_help' %}">Get help</a></p>
+    </section>
+  </div>
+</div>
+{% endblock %}
